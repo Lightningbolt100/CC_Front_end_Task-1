@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Next.js build output and env files
+.next/
+next-env.d.ts
+
+# Optional: If you want to ignore config files (though usually people push these)
+# next.config.js
+# tsconfig.json

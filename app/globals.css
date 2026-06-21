@@ -1,0 +1,53 @@
+/* ISS Telemetry — Global Styles */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --space-bg:        #0a0e1a;
+  --space-surface:   #111827;
+  --space-card:      #161d2e;
+  --space-border:    #1e2d45;
+  --space-border-hi: #2a3f5f;
+
+  --cyan:            #00d4ff;
+  --cyan-dim:        #0099bb;
+  --cyan-glow:       rgba(0, 212, 255, 0.12);
+
+  --text-primary:    #e8f4f8;
+  --text-secondary:  #8899aa;
+  --text-muted:      #4a5568;
+
+  --success:         #22c55e;
+  --error:           #ef4444;
+
+  --font-display:    'Space Grotesk', sans-serif;
+  --font-body:       'Inter', sans-serif;
+  --font-mono:       'JetBrains Mono', monospace;
+
+  --radius-sm:       6px;
+  --radius-md:       10px;
+  --radius-lg:       16px;
+
+  --transition:      0.2s ease;
+}
+
+html, body {
+  height: 100%;
+  background-color: var(--space-bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--cyan); text-decoration: none; }
+button { cursor: pointer; font-family: var(--font-body); }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--space-surface); }
+::-webkit-scrollbar-thumb { background: var(--space-border-hi); border-radius: 3px; }
