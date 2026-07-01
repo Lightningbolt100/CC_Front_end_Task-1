@@ -1,6 +1,5 @@
-import TelemetryDashboard from './TelemetryDashboard'
+import TelemetryDashboard from "./TelemetryDashboard";
 
-// Server Component — handles layout/structure
 export default function DashboardPage() {
   return (
     <main className="dashboard-page">
@@ -13,11 +12,12 @@ export default function DashboardPage() {
           <h1 className="dash-title">ISS Telemetry Log</h1>
         </div>
         <div className="header-right">
-          <span className="header-sub">International Space Station · ZARYA / 25544</span>
+          <span className="header-sub">
+            International Space Station · ZARYA / 25544
+          </span>
         </div>
       </header>
 
-      {/* All interactive/stateful logic lives in the Client Component */}
       <TelemetryDashboard />
 
       <style>{`
@@ -99,5 +99,5 @@ export default function DashboardPage() {
         }
       `}</style>
     </main>
-  )
+  );
 }

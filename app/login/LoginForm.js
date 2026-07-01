@@ -1,34 +1,34 @@
-'use client'
+"use client";
 
-import { useState, FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
-  const router = useRouter()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setError('')
+  function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
 
     if (!username.trim() || !password.trim()) {
-      setError('Please fill in both fields.')
-      return
+      setError("Please fill in both fields.");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
-    // simulate a brief auth delay — feels more real
     setTimeout(() => {
-      // mock JWT token stored in cookie
-      const mockToken = btoa(JSON.stringify({ user: username, iat: Date.now() }))
-      document.cookie = `iss_auth_token=${mockToken}; path=/; max-age=86400; SameSite=Lax`
+      const mockToken = btoa(
+        JSON.stringify({ user: username, iat: Date.now() }),
+      );
+      document.cookie = `iss_auth_token=${mockToken}; path=/; max-age=86400; SameSite=Lax`;
 
-      router.push('/dashboard')
-    }, 600)
+      router.push("/dashboard");
+    }, 600);
   }
 
   return (
@@ -67,7 +67,7 @@ export default function LoginForm() {
             Authenticating...
           </span>
         ) : (
-          'Access Dashboard →'
+          "Access Dashboard →"
         )}
       </button>
 
@@ -174,5 +174,5 @@ export default function LoginForm() {
         }
       `}</style>
     </form>
-  )
+  );
 }

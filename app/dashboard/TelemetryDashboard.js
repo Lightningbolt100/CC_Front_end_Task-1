@@ -1,52 +1,42 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useRef } from 'react'
-import axios from 'axios'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-interface TelemetryEntry {
-  id: number
-  latitude: number
-  longitude: number
-  altitude: number
-  velocity: number
-  timestamp: number
-  visibility: string
+function formatCoord(val, isLat) {
+  const abs = Math.abs(val);
+  const dir = isLat ? (val >= 0 ? "N" : "S") : val >= 0 ? "E" : "W";
+  return `${abs.toFixed(4)}° ${dir}`;
 }
 
-function formatCoord(val: number, isLat: boolean): string {
-  const abs = Math.abs(val)
-  const dir = isLat ? (val >= 0 ? 'N' : 'S') : (val >= 0 ? 'E' : 'W')
-  return `${abs.toFixed(4)}° ${dir}`
-}
-
-function formatTime(ts: number): string {
+function formatTime(ts) {
   return new Date(ts * 1000).toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  })
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
-const RECORDS_PER_PAGE = 10
-const ISS_API = 'https://api.wheretheiss.at/v1/satellites/25544'
+const RECORDS_PER_PAGE = 10;
+const ISS_API = "https://api.wheretheiss.at/v1/satellites/25544";
 
 export default function TelemetryDashboard() {
-  const router = useRouter()
-  const [log, setLog] = useState<TelemetryEntry[]>([])
-  const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(true)
-  const [fetchError, setFetchError] = useState('')
-  const [countdown, setCountdown] = useState(10)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
-  const idRef = useRef(0)
+  const router = useRouter();
+  const [log, setLog] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
+  const [countdown, setCountdown] = useState(10);
+  const intervalRef = useRef(null);
+  const idRef = useRef(0);
 
   useEffect(() => {
     async function fetchISS() {
       try {
-        const res = await axios.get(ISS_API)
-        const data = res.data
-        const entry: TelemetryEntry = {
+        const res = await axios.get(ISS_API);
+        const data = res.data;
+        const entry = {
           id: ++idRef.current,
           latitude: data.latitude,
           longitude: data.longitude,
@@ -54,48 +44,46 @@ export default function TelemetryDashboard() {
           velocity: data.velocity,
           timestamp: data.timestamp,
           visibility: data.visibility,
-        }
-        setLog((prev) => [entry, ...prev])
-        setFetchError('')
+        };
+        setLog((prev) => [entry, ...prev]);
+        setFetchError("");
       } catch {
-        setFetchError('Could not fetch ISS data. Will retry in 10 seconds.')
+        setFetchError("Could not fetch ISS data. Will retry in 10 seconds.");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    fetchISS()
-    intervalRef.current = setInterval(fetchISS, 10000)
+    fetchISS();
+    intervalRef.current = setInterval(fetchISS, 10000);
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [])
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   useEffect(() => {
-    if (loading) return
-    setCountdown(10)
+    if (loading) return;
+    setCountdown(10);
     const tick = setInterval(() => {
-      setCountdown((c) => (c <= 1 ? 10 : c - 1))
-    }, 1000)
-    return () => clearInterval(tick)
-  }, [log.length, loading])
+      setCountdown((c) => (c <= 1 ? 10 : c - 1));
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [log.length, loading]);
 
   function handleLogout() {
-    if (intervalRef.current) clearInterval(intervalRef.current)
-    document.cookie = 'iss_auth_token=; path=/; max-age=0'
-    router.push('/login')
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    document.cookie = "iss_auth_token=; path=/; max-age=0";
+    router.push("/login");
   }
 
-  const totalPages = Math.max(1, Math.ceil(log.length / RECORDS_PER_PAGE))
-  const pageStart = (page - 1) * RECORDS_PER_PAGE
-  const pageData = log.slice(pageStart, pageStart + RECORDS_PER_PAGE)
-  const latest = log[0] ?? null
+  const totalPages = Math.max(1, Math.ceil(log.length / RECORDS_PER_PAGE));
+  const pageStart = (page - 1) * RECORDS_PER_PAGE;
+  const pageData = log.slice(pageStart, pageStart + RECORDS_PER_PAGE);
+  const latest = log[0] ?? null;
 
   return (
     <div className="tdb-root">
-
-      {/* latest values strip */}
       <div className="status-strip">
         {loading ? (
           <span className="loading-text">Fetching ISS position...</span>
@@ -103,27 +91,37 @@ export default function TelemetryDashboard() {
           <>
             <div className="status-stat">
               <span className="stat-label">Latitude</span>
-              <span className="stat-value">{formatCoord(latest.latitude, true)}</span>
+              <span className="stat-value">
+                {formatCoord(latest.latitude, true)}
+              </span>
             </div>
             <div className="status-divider" />
             <div className="status-stat">
               <span className="stat-label">Longitude</span>
-              <span className="stat-value">{formatCoord(latest.longitude, false)}</span>
+              <span className="stat-value">
+                {formatCoord(latest.longitude, false)}
+              </span>
             </div>
             <div className="status-divider" />
             <div className="status-stat">
               <span className="stat-label">Altitude</span>
-              <span className="stat-value">{latest.altitude.toFixed(1)} km</span>
+              <span className="stat-value">
+                {latest.altitude.toFixed(1)} km
+              </span>
             </div>
             <div className="status-divider" />
             <div className="status-stat">
               <span className="stat-label">Velocity</span>
-              <span className="stat-value">{latest.velocity.toFixed(1)} km/h</span>
+              <span className="stat-value">
+                {latest.velocity.toFixed(1)} km/h
+              </span>
             </div>
             <div className="status-divider" />
             <div className="status-stat">
               <span className="stat-label">Next update</span>
-              <span className="stat-value" style={{ color: 'var(--cyan)' }}>{countdown}s</span>
+              <span className="stat-value" style={{ color: "var(--cyan)" }}>
+                {countdown}s
+              </span>
             </div>
           </>
         ) : null}
@@ -135,14 +133,13 @@ export default function TelemetryDashboard() {
 
       {fetchError && <div className="error-banner">{fetchError}</div>}
 
-      {/* history table */}
       <div className="table-card">
         <div className="table-card-header">
           <h2 className="table-title">Flight History Log</h2>
           <p className="table-sub">
             {log.length === 0
-              ? 'Waiting for first reading...'
-              : `${log.length} reading${log.length === 1 ? '' : 's'} collected`}
+              ? "Waiting for first reading..."
+              : `${log.length} reading${log.length === 1 ? "" : "s"} collected`}
           </p>
         </div>
 
@@ -162,19 +159,27 @@ export default function TelemetryDashboard() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="td-empty">Loading...</td>
+                  <td colSpan={7} className="td-empty">
+                    Loading...
+                  </td>
                 </tr>
               ) : pageData.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="td-empty">No data yet</td>
+                  <td colSpan={7} className="td-empty">
+                    No data yet
+                  </td>
                 </tr>
               ) : (
                 pageData.map((entry) => (
                   <tr key={entry.id}>
                     <td className="mono muted">{entry.id}</td>
                     <td className="mono">{formatTime(entry.timestamp)}</td>
-                    <td className="mono">{formatCoord(entry.latitude, true)}</td>
-                    <td className="mono">{formatCoord(entry.longitude, false)}</td>
+                    <td className="mono">
+                      {formatCoord(entry.latitude, true)}
+                    </td>
+                    <td className="mono">
+                      {formatCoord(entry.longitude, false)}
+                    </td>
                     <td className="mono">{entry.altitude.toFixed(2)}</td>
                     <td className="mono">{entry.velocity.toFixed(2)}</td>
                     <td className="vis">{entry.visibility}</td>
@@ -185,7 +190,6 @@ export default function TelemetryDashboard() {
           </table>
         </div>
 
-        {/* pagination */}
         <div className="pagination">
           <span className="page-info">
             Page {page} of {totalPages}
@@ -403,5 +407,5 @@ export default function TelemetryDashboard() {
         }
       `}</style>
     </div>
-  )
+  );
 }
